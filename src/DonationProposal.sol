@@ -63,6 +63,10 @@ contract DonationProposal {
                 payable(voters[i]).transfer(STAKE_AMOUNT);
             }
         } else {
+            for (uint i = 0; i < voters.length; i++) {
+                payable(voters[i]).transfer(STAKE_AMOUNT);
+            }
+
             for (uint i = 0; i < donors.length; i++) {
                 address donor = donors[i];
                 payable(donor).transfer(donations[donor]);
