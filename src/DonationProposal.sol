@@ -6,25 +6,25 @@ import "./MemberRegistry.sol";
 contract DonationProposal {
     address public proposer;
     string public proposalText;
-    uint public totalDonation;
-    uint public voteCount;
-    uint public voterCount;
-    uint public endTime;
-    uint public donationEndTime;
+    uint256 public totalDonation;
+    uint256 public voteCount;
+    uint256 public voterCount;
+    uint256 public endTime;
+    uint256 public donationEndTime;
     bool public votePassed;
     bool public finalized;
     bool public withdrawn;
 
-    uint public constant STAKE_AMOUNT = 1000 wei;
+    uint256 public constant STAKE_AMOUNT = 1000 wei;
 
     MemberRegistry public registry;
 
-    mapping(address => uint) public donations;
+    mapping(address => uint256) public donations;
     mapping(address => bool) public hasVoted;
     address[] public donors;
     address[] public voters;
 
-    constructor(address _proposer, string memory _text, address _registry, uint _donationDurationMinutes) {
+    constructor(address _proposer, string memory _text, address _registry, uint256 _donationDurationMinutes) {
         proposer = _proposer;
         proposalText = _text;
         registry = MemberRegistry(_registry);
@@ -59,15 +59,15 @@ contract DonationProposal {
 
         if (voteCount * 3 >= voterCount * 2) {
             votePassed = true;
-            for (uint i = 0; i < voters.length; i++) {
+            for (uint256 i = 0; i < voters.length; i++) {
                 payable(voters[i]).transfer(STAKE_AMOUNT);
             }
         } else {
-            for (uint i = 0; i < voters.length; i++) {
+            for (uint256 i = 0; i < voters.length; i++) {
                 payable(voters[i]).transfer(STAKE_AMOUNT);
             }
 
-            for (uint i = 0; i < donors.length; i++) {
+            for (uint256 i = 0; i < donors.length; i++) {
                 address donor = donors[i];
                 payable(donor).transfer(donations[donor]);
                 donations[donor] = 0;
@@ -92,9 +92,11 @@ contract DonationProposal {
         payable(proposer).transfer(address(this).balance);
     }
 
-    function getSummary() public view returns (
-        address, string memory, uint, bool, uint, uint, uint, bool, uint
-    ) {
+    function getSummary()
+        public
+        view
+        returns (address, string memory, uint256, bool, uint256, uint256, uint256, bool, uint256)
+    {
         return (
             proposer,
             proposalText,

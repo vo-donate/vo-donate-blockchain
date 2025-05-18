@@ -16,7 +16,7 @@ contract DonationTest is Test {
 
     function setUp() public {
         // 초기 지갑 10개 생성 및 10 ETH씩 할당
-        for (uint i = 1; i <= 10; i++) {
+        for (uint256 i = 1; i <= 10; i++) {
             address wallet = vm.addr(i);
             vm.deal(wallet, 10 ether);
             users.push(wallet);
@@ -32,7 +32,7 @@ contract DonationTest is Test {
         vm.stopPrank();
 
         // proposer 포함 9명 멤버 등록
-        for (uint i = 1; i < 10; i++) {
+        for (uint256 i = 1; i < 10; i++) {
             vm.prank(deployer);
             registry.register(users[i]);
         }
@@ -48,13 +48,13 @@ contract DonationTest is Test {
         DonationProposal proposal = DonationProposal(proposals[0]);
 
         // 찬성 6명 투표
-        for (uint i = 2; i < 8; i++) {
+        for (uint256 i = 2; i < 8; i++) {
             vm.prank(users[i]);
             proposal.vote{value: 1000 wei}(true);
         }
 
         // 반대 2명 투표
-        for (uint i = 8; i < 10; i++) {
+        for (uint256 i = 8; i < 10; i++) {
             vm.prank(users[i]);
             proposal.vote{value: 1000 wei}(false);
         }
@@ -70,7 +70,7 @@ contract DonationTest is Test {
         assertTrue(proposal.votePassed(), "Donation Test Fail");
 
         // 6명 기부 (1 ETH씩)
-        for (uint i = 2; i < 8; i++) {
+        for (uint256 i = 2; i < 8; i++) {
             vm.prank(users[i]);
             proposal.donate{value: 1 ether}();
         }
@@ -79,13 +79,13 @@ contract DonationTest is Test {
         skip(2 minutes);
 
         // withdraw 전 proposer 잔액
-        uint before = proposer.balance;
+        uint256 before = proposer.balance;
 
         // proposer가 withdraw
         vm.prank(proposer);
         proposal.withdraw();
 
-        uint afterBalance = proposer.balance;
+        uint256 afterBalance = proposer.balance;
 
         // 6 ETH 만큼 증가했는지 확인
         assertEq(afterBalance - before, 6 ether, "Donation Withdraw Fail");
@@ -102,20 +102,20 @@ contract DonationTest is Test {
         DonationProposal proposal = DonationProposal(proposals[0]);
 
         // 찬성 4명 투표
-        for (uint i = 2; i < 6; i++) {
+        for (uint256 i = 2; i < 6; i++) {
             vm.prank(users[i]);
             proposal.vote{value: 1000 wei}(true);
         }
 
         // 반대 4명 투표
-        for (uint i = 6; i < 10; i++) {
+        for (uint256 i = 6; i < 10; i++) {
             vm.prank(users[i]);
             proposal.vote{value: 1000 wei}(false);
         }
 
         // 투표 전 잔액 저장
         uint256[8] memory beforeBalances;
-        for (uint i = 2; i < 10; i++) {
+        for (uint256 i = 2; i < 10; i++) {
             beforeBalances[i - 2] = users[i].balance;
         }
 
@@ -127,9 +127,9 @@ contract DonationTest is Test {
         assertTrue(!proposal.votePassed(), "Vote Must be Fail");
 
         // 모든 투표자에게 환불 확인
-        for (uint i = 2; i < 10; i++) {
-            uint actualBalance = users[i].balance;
-            uint expectedBalance = 10 ether;
+        for (uint256 i = 2; i < 10; i++) {
+            uint256 actualBalance = users[i].balance;
+            uint256 expectedBalance = 10 ether;
             assertEq(actualBalance, expectedBalance, "Refund Fail");
         }
     }
