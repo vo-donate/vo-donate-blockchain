@@ -67,7 +67,7 @@ contract DonationTest is Test {
         vm.prank(proposer);
         proposal.finalizeVote();
 
-        assertTrue(proposal.votePassed(), "donation fail");
+        assertTrue(proposal.votePassed(), "Donation Test Fail");
 
         // 6명 기부 (1 ETH씩)
         for (uint i = 2; i < 8; i++) {
@@ -88,6 +88,49 @@ contract DonationTest is Test {
         uint afterBalance = proposer.balance;
 
         // 6 ETH 만큼 증가했는지 확인
-        assertEq(afterBalance - before, 6 ether, "donation withdraw fail");
+        assertEq(afterBalance - before, 6 ether, "Donation Withdraw Fail");
+    }
+
+    function testVoteFailRefund() public {
+        address testProposer = users[1];
+
+        // proposer가 제안 생성
+        vm.prank(testProposer);
+        factory.createProposal("Donation Test Fail", 2);
+
+        address[] memory proposals = factory.getProposals();
+        DonationProposal proposal = DonationProposal(proposals[0]);
+
+        // 찬성 4명 투표
+        for (uint i = 2; i < 6; i++) {
+            vm.prank(users[i]);
+            proposal.vote{value: 1000 wei}(true);
+        }
+
+        // 반대 4명 투표
+        for (uint i = 6; i < 10; i++) {
+            vm.prank(users[i]);
+            proposal.vote{value: 1000 wei}(false);
+        }
+
+        // 투표 전 잔액 저장
+        uint256[8] memory beforeBalances;
+        for (uint i = 2; i < 10; i++) {
+            beforeBalances[i - 2] = users[i].balance;
+        }
+
+        // 시간 경과 후 finalize
+        skip(1 hours);
+        vm.prank(testProposer);
+        proposal.finalizeVote();
+
+        assertTrue(!proposal.votePassed(), "Vote Must be Fail");
+
+        // 모든 투표자에게 환불 확인
+        for (uint i = 2; i < 10; i++) {
+            uint actualBalance = users[i].balance;
+            uint expectedBalance = 10 ether;
+            assertEq(actualBalance, expectedBalance, "Refund Fail");
+        }
     }
 }
