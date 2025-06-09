@@ -48,7 +48,7 @@ $ anvil
 ### Deploy
 
 ```shell
-$ forge script script/Donation.s.sol:DeployScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ forge script script/Donation.s.sol:DeployScript --rpc-url <your_rpc_url> --private-key <your_private_key> --broadcast --verify --chain 1001
 ```
 
 ### Cast
@@ -63,4 +63,11 @@ $ cast <subcommand>
 $ forge --help
 $ anvil --help
 $ cast --help
+```
+
+### Logs
+
+```shell
+$ Registry deployed at: 0x6c5833155dD6471E7F0F3569B206E6baa3717c8c
+$ Factory deployed at: 0x23a0854C507E5f6dd91215f83D0b9885ED674F4e
 ```

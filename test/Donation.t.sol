@@ -41,7 +41,7 @@ contract DonationTest is Test {
     function testProposalFlow() public {
         // proposer가 제안 생성
         vm.prank(proposer);
-        factory.createProposal("Scholarship Donation", 2);
+        factory.createProposal("Scholarship Donation", 60, 2);
 
         // 제안 주소 확인
         address[] memory proposals = factory.getProposals();
@@ -96,7 +96,7 @@ contract DonationTest is Test {
 
         // proposer가 제안 생성
         vm.prank(testProposer);
-        factory.createProposal("Donation Test Fail", 2);
+        factory.createProposal("Donation Test Fail", 60, 2);
 
         address[] memory proposals = factory.getProposals();
         DonationProposal proposal = DonationProposal(proposals[0]);

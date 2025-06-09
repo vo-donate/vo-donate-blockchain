@@ -24,11 +24,11 @@ contract DonationProposal {
     address[] public donors;
     address[] public voters;
 
-    constructor(address _proposer, string memory _text, address _registry, uint256 _donationDurationMinutes) {
+    constructor(address _proposer, string memory _text, address _registry, uint256 _voteDurationMinutes, uint256 _donationDurationMinutes) {
         proposer = _proposer;
         proposalText = _text;
         registry = MemberRegistry(_registry);
-        endTime = block.timestamp + 1 hours;
+        endTime = block.timestamp + (_voteDurationMinutes * 1 minutes);
         donationEndTime = endTime + (_donationDurationMinutes * 1 minutes);
     }
 
@@ -57,7 +57,7 @@ contract DonationProposal {
         require(!finalized, "Already finalized");
         finalized = true;
 
-        if (voteCount * 3 >= voterCount * 2) {
+        if (voteCount * 3 >= registry.getMemberCount() * 2) {
             votePassed = true;
             for (uint256 i = 0; i < voters.length; i++) {
                 payable(voters[i]).transfer(STAKE_AMOUNT);
