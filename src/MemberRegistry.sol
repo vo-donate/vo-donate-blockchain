@@ -16,7 +16,7 @@ contract MemberRegistry {
     }
 
     function register(address _user) external onlyOwner {
-        if(!isMember[_user]) {
+        if (!isMember[_user]) {
             isMember[_user] = true;
             member.push(_user);
         }
@@ -26,9 +26,9 @@ contract MemberRegistry {
         require(isMember[_user], "User not a member");
         isMember[_user] = false;
 
-        for(uint256 i = 0; i < member.length; i++) {
-            if(member[i] == _user) {
-                member[i] = member[member.length -1];
+        for (uint256 i = 0; i < member.length; i++) {
+            if (member[i] == _user) {
+                member[i] = member[member.length - 1];
                 member.pop();
                 break;
             }

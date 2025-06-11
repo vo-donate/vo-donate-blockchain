@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import "./MemberRegistry.sol";
 
 contract DonationProposal {
+    MemberRegistry public registry;
+
     address public proposer;
     string public proposalText;
     uint256 public totalDonation;
@@ -17,17 +19,22 @@ contract DonationProposal {
 
     uint256 public constant STAKE_AMOUNT = 1000 wei;
 
-    MemberRegistry public registry;
-
     mapping(address => uint256) public donations;
     mapping(address => bool) public hasVoted;
     address[] public donors;
     address[] public voters;
 
-    constructor(address _proposer, string memory _text, address _registry, uint256 _voteDurationMinutes, uint256 _donationDurationMinutes) {
+    constructor(
+        address _proposer,
+        string memory _text,
+        address _registry,
+        uint256 _voteDurationMinutes,
+        uint256 _donationDurationMinutes
+    ) {
         proposer = _proposer;
         proposalText = _text;
         registry = MemberRegistry(_registry);
+        voterCount = registry.getMemberCount();
         endTime = block.timestamp + (_voteDurationMinutes * 1 minutes);
         donationEndTime = endTime + (_donationDurationMinutes * 1 minutes);
     }
@@ -49,7 +56,6 @@ contract DonationProposal {
 
         voters.push(msg.sender);
         hasVoted[msg.sender] = true;
-        voterCount++;
         if (approve) voteCount++;
     }
 
@@ -57,21 +63,12 @@ contract DonationProposal {
         require(!finalized, "Already finalized");
         finalized = true;
 
-        if (voteCount * 3 >= registry.getMemberCount() * 2) {
+        if (voteCount * 3 >= voterCount * 2) {
             votePassed = true;
-            for (uint256 i = 0; i < voters.length; i++) {
-                payable(voters[i]).transfer(STAKE_AMOUNT);
-            }
-        } else {
-            for (uint256 i = 0; i < voters.length; i++) {
-                payable(voters[i]).transfer(STAKE_AMOUNT);
-            }
+        }
 
-            for (uint256 i = 0; i < donors.length; i++) {
-                address donor = donors[i];
-                payable(donor).transfer(donations[donor]);
-                donations[donor] = 0;
-            }
+        for (uint256 i = 0; i < voters.length; i++) {
+            payable(voters[i]).transfer(STAKE_AMOUNT);
         }
     }
 
